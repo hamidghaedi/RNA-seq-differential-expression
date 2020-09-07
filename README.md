@@ -65,7 +65,7 @@ all(rownames(clinical) == colnames(rna))
 ### 2. Data transformation, quality control and  normalization
 For differential expression analysis, using the raw counts is fine. However before performing any analysis it is good idea to have a general picture about the data shape and pattern. To this aim it is necessary to transform data. For data transformation we will use variance stabilizing transformations (VST). This methods is finely described in the [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8). Transformed data is helpful to do some quality control checking onexpression data. Quality control metrics would be used to check *sample level QC* and *gene level QC*. The DESeq2 package workflow performs gene level QCautomatically. This includes removing genes that are very unlikely to be differentiallyexpressed in the study design. Such genes are possibly those with zero countsin all samples, those with a hugely skewed read count and low mean normalizedcounts. 
 
-By sample level QC, we can get how well the biological replicates(samples in different groups) cluster together. Actually sample level QC isapplied to answer the questions “How are samples similar to each other in termsof expression values?” , “ Which samples are different from each other? Do thesedifferences align with our expectation from study design?” There are two analysis useful  to gain insight into sample level QC: PCA and Hierarchical clustering. 
+By sample level QC, we can get how well the biological replicates(samples in different groups) cluster together. Actually sample level QC isapplied to answer the questions “How are samples similar to each other in termsof expression values?” , “ Which samples are different from each other?”,  ”Do thesedifferences align with our expectation from study design?” There are two statistical tools useful  to gain insight into sample level QC: *PCA* and *Hierarchical clustering*. 
 
 ```R
 #_______Making_Expression_Object__________#
@@ -86,7 +86,7 @@ clinical$definition <- relevel(clinical$definition, ref = "Solid_Tissue_Normal")
 dds <- DESeqDataSetFromMatrix(countData = rna,
                               colData = clinical,
                               design = ~ definition)
-dds
+#dds
 
 # prefilteration: it is not necessary but recommended to filter out low expressed genes
 
@@ -96,4 +96,32 @@ dds <- dds[keep,]
 # data tranfromation
 vsd <- vst(dds, blind=FALSE)
 
+# making PC object
+p <- pca(assay(vsd), metadata = colData(vsd), removeVar = 0.1)
+
+# create PCA plot for PCA1 and PCA2
+biplot(p, colby = "definition", lab = NULL, legendPosition = 'right')
+```
+![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/pc1.PNG)
+```R
+# Fol all top 10 possible combination 
+pairsplot(p,
+          components = getComponents(p, c(1:10)),
+          triangle = TRUE, trianglelabSize = 12,
+          hline = 0, vline = 0,
+          pointSize = 0.4,
+          gridlines.major = FALSE, gridlines.minor = FALSE,
+          colby = 'definition',
+          title = 'Pairs plot', plotaxes = FALSE,
+          margingaps = unit(c(-0.01, -0.01, -0.01, -0.01), 'cm'))
+
+##An eigencor plot could help to find correlation between different PC and clinical variables
+eigencorplot(p, metavars = c("shortLetterCode","paper_mRNA.cluster","paper_Age.at.diagnosis","paper_AJCC.pathologic.tumor.stage", "race","gender"))
+# sample to sample heatmap
+sampleDists <- dist(t(assay(vsd)))
+
+#Heat map only for normal sammples
+normal_idx <- substr(colnames(assay(vsd)),14,14) == "1"
+norm_sample <- assay(vsd)[, normal_idx]
+sampleDists <- dist(t(norm_sample))
 ```
