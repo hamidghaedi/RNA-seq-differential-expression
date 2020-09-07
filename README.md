@@ -103,6 +103,10 @@ p <- pca(assay(vsd), metadata = colData(vsd), removeVar = 0.1)
 biplot(p, colby = "definition", lab = NULL, legendPosition = 'right')
 ```
 ![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/pc1.PNG)
+
+As depicted by the above plot, samples are somehow clustered together based on the “definition” variable levels: “Solid_Tissue_Normal”, and “Primary_solid_Tumor”.  Its helpful to see how other PCs -other than PC1 and PC2 would clusters samples together. There are no PC combinations that can perfectly cluster samples based on the “definition” variable and this is may be because of how RNA-seq data are. 
+
+
 ```R
 # Fol all top 10 possible combination 
 pairsplot(p,
@@ -114,7 +118,11 @@ pairsplot(p,
           colby = 'definition',
           title = 'Pairs plot', plotaxes = FALSE,
           margingaps = unit(c(-0.01, -0.01, -0.01, -0.01), 'cm'))
+```
 
+![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/pc2.png)
+
+```R
 ##An eigencor plot could help to find correlation between different PC and clinical variables
 eigencorplot(p, metavars = c("shortLetterCode","paper_mRNA.cluster","paper_Age.at.diagnosis","paper_AJCC.pathologic.tumor.stage", "race","gender"))
 # sample to sample heatmap
