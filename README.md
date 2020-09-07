@@ -128,6 +128,8 @@ pairsplot(p,
 normal_idx <- substr(colnames(assay(vsd)),14,14) == "1"
 n_sample <- assay(vsd)[, c(normal_idx) ]
 colnames(n_sample) <- paste("NT_", substr(colnames(n_sample),1,12))
+
+# Dissimilarity matrix calculation
 sampleDists <- dist(t(n_sample))
 sampleDistMatrix <- as.matrix(sampleDists)
 rownames(sampleDistMatrix) <- c(colnames(n_sample), colnames(t_sample))
