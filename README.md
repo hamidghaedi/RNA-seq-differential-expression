@@ -122,9 +122,9 @@ pairsplot(p,
 
 ![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/pc2.png)
 
+*Hierarchical clustering* is suitable to visualize similarities between samples in regard to gene expression profile. At the same time it will provide information about how gene expression profiles are different between samples. Here we have a total of 433 samples , so visualizing all these sample in a plot would not be very informative. Here I will compare 19 normal samples and also a randomly picked 20 tumor sample for making a sample-sample heatmap for visualizing hierarchical clustering 
+
 ```R
-##An eigencor plot could help to find correlation between different PC and clinical variables
-eigencorplot(p, metavars = c("shortLetterCode","paper_mRNA.cluster","paper_Age.at.diagnosis","paper_AJCC.pathologic.tumor.stage", "race","gender"))
 # sample to sample heatmap
 sampleDists <- dist(t(assay(vsd)))
 
