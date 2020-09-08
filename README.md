@@ -165,13 +165,12 @@ ens2symbol<-function(ids){
   return(genes)
 }
 
-df <- ens2symbol(row.names((resOrdered))
+df <- ens2symbol(row.names(res))
 
 res_df <- as.data.frame(res)                 
 res_df$ensembl_gene_id <- row.names(res_df)
 res_df <- merge(df,res_df, by = "ensembl_gene_id")
 resOrdered<-res_df[with(res_df, order(abs(log2FoldChange), padj, decreasing = TRUE)), ]
-
 
 #saving the results
 write.csv(res_df, 
@@ -188,3 +187,8 @@ resIHWOrdered <- resIHW_df[with(resIHW_df, order(abs(log2FoldChange), padj, decr
 
 write.csv(resIHW_df, 
           file= paste0("IHW",resultsNames(dds)[2], ".csv"))
+```
+### 4. Visualization
+There are several way for gene expression analysis results  visualization. 
+```R
+#ploting genes differentially expressed 
