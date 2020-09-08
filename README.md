@@ -142,3 +142,49 @@ pheatmap(sampleDistMatrix,
          col=colors)
 ```
 ![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/hc.png)
+
+
+### 3. Differential gene expression analysis
+```R
+#_______DE_analysis________#
+ 
+dds <- DESeq(dds) #This would take some time
+
+#default method
+res <- results(dds, alpha = 0.05,  altHypothesis = "greaterAbs", lfcThreshold = 1.5) # alpha controls FDR rate
+
+#result Log fold change shrinkage method (suitable for logfc based visualization)
+resLFC <- lfcShrink(dds, coef=resultsNames(dds)[2], type="apeglm")
+
+# converting Ensebl id to Gene symbole using biomart
+ens2symbol<-function(ids){
+  mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+  genes <- getBM(filters= "ensembl_gene_id", 
+                 attributes= c("ensembl_gene_id","hgnc_symbol"),
+                 values=ids, mart= mart)
+  return(genes)
+}
+
+df <- ens2symbol(row.names((resOrdered))
+
+res_df <- as.data.frame(res)                 
+res_df$ensembl_gene_id <- row.names(res_df)
+res_df <- merge(df,res_df, by = "ensembl_gene_id")
+resOrdered<-res_df[with(res_df, order(abs(log2FoldChange), padj, decreasing = TRUE)), ]
+
+
+#saving the results
+write.csv(res_df, 
+          file= paste0(resultsNames(dds)[2], ".csv")
+
+          
+#result with Independent hypothesis weighting
+resIHW <- results(dds, filterFun=ihw, alpha = 0.05, altHypothesis = "greaterAbs", lfcThreshold = 1.5)
+resIHW_df <- as.data.frame(resIHW)                 
+resIHW_df$ensembl_gene_id <- row.names(resIHW_df)
+resIHW_df <- merge(df,resIHW_df, by = "ensembl_gene_id")
+
+resIHWOrdered <- resIHW_df[with(resIHW_df, order(abs(log2FoldChange), padj, decreasing = TRUE)), ]
+
+write.csv(resIHW_df, 
+          file= paste0("IHW",resultsNames(dds)[2], ".csv"))
