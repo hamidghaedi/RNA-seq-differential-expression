@@ -25,6 +25,8 @@ library("apeglm") # bioconductor package
 library("pheatmap") # CRAN package
 library("RColorBrewer") # CRAN package
 library("PCAtools") # bioconductor package
+library(reshape2) # CRAN package
+
 
 #_______ Donloading_Data_______#
 query_TCGA = GDCquery(
@@ -155,6 +157,7 @@ res <- results(dds, alpha = 0.05,  altHypothesis = "greaterAbs", lfcThreshold = 
 
 #result Log fold change shrinkage method (suitable for logfc based visualization)
 resLFC <- lfcShrink(dds, coef=resultsNames(dds)[2], type="apeglm")
+resLFC.Ordered<-resLFC[with(resLFC, order(abs(log2FoldChange), padj, decreasing = TRUE)), ]
 
 # converting Ensebl id to Gene symbole using biomart
 ens2symbol<-function(ids){
@@ -190,5 +193,48 @@ write.csv(resIHW_df,
 ```
 ### 4. Visualization
 There are several way for gene expression analysis results  visualization. 
+
+*MA-plot* visualize gene significantly (blue dots with p < 0.05) up-regulated (log2FC > 1.5) or down-regulated (log2FC < -1.5). 
+
 ```R
 #ploting genes differentially expressed 
+ylim <- c(-6.5,6.5)
+drawLines <- function() abline(h=c(-1.5,1.5),col="dodgerblue",lwd=2)
+plotMA(resLFC, ylim=ylim); drawLines()
+```
+![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/ma-plot.png)
+
+*Top 25 dysregulated gene*
+```R
+
+# obtaining normalized count read
+dys_reg <- assay(vsd)[which(row.names(assay(vsd)) %in% resOrdered$ensembl_gene_id [1:25]), ]
+
+#melting dataset for visualization
+melted_norm_counts <-data.frame(melt(dys_reg))
+colnames(melted_norm_counts) <- c("gene", "samplename", "normalized_counts")
+melted_norm_counts$group <- ifelse(melted_norm_counts$samplename %in% colnames(assay(vsd))[normal_idx], "Normal", "Tumor")
+
+# write.table to import in python
+```
+It is very interesting to visualize gene count data by violin plot. It is very informative! At the time of writing , there is no easy way to plot values in R "dodge" fashion. So I exported data into a file to plot this file in ```python```. The jupyter notebook code could be find in the repostory.
+
+```python
+import pandas as pd
+import seaborn as sns
+from matplotlib.pyplot import figure
+
+#reading data
+data = pd.read_csv('data.csv') 
+data.head()
+
+## plotting data
+figure(num=None, figsize=(14, 6), dpi=300, facecolor='w', edgecolor='k')
+
+graph = sns.violinplot(x="gene", y="normalized_counts", hue="group",
+
+                    data=data, palette="Set3", split=True)
+graph.set_xticklabels(graph.get_xticklabels(), rotation=45, horizontalalignment='right')
+```
+![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/violion.png)
+
