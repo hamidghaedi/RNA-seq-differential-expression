@@ -232,9 +232,7 @@ data.head()
 ## plotting data
 figure(num=None, figsize=(14, 6), dpi=300, facecolor='w', edgecolor='k')
 
-graph = sns.violinplot(x="gene", y="normalized_counts", hue="group",
-
-                    data=data, palette="Set3", split=True)
+graph = sns.violinplot(x="gene", y="normalized_counts", hue="group", data=data, palette="Set3", split=True)
 graph.set_xticklabels(graph.get_xticklabels(), rotation=45, horizontalalignment='right')
 ```
 ![alt text](https://github.com/hamidghaedi/RNA-seq-differential-expression/blob/master/violion.png)
