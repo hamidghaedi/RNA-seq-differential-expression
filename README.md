@@ -216,6 +216,7 @@ colnames(melted_norm_counts) <- c("gene", "samplename", "normalized_counts")
 melted_norm_counts$group <- ifelse(melted_norm_counts$samplename %in% colnames(assay(vsd))[normal_idx], "Normal", "Tumor")
 
 # write.table to import in python
+write.table(melted_norm_counts, file = "data.csv", sep = ",", row.names = F)
 ```
 It is very interesting to visualize gene count data by violin plot. It is very informative! At the time of writing , there is no easy way to plot values in R "dodge" fashion. So I exported data into a file to plot this file in ```python```. The jupyter notebook code could be find in the repostory.
 
