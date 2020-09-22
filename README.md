@@ -28,7 +28,7 @@ library("PCAtools") # bioconductor package
 library(reshape2) # CRAN package
 
 
-#_______ Donloading_Data_______#
+#_______ Downloading_Data_______#
 query_TCGA = GDCquery(
   project = "TCGA-BLCA",
   data.category = "Transcriptome Profiling", # parameter enforced by GDCquery
