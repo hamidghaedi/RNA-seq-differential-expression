@@ -177,7 +177,7 @@ resOrdered<-res_df[with(res_df, order(abs(log2FoldChange), padj, decreasing = TR
 
 #saving the results
 write.csv(res_df, 
-          file= paste0(resultsNames(dds)[2], ".csv")
+          file= paste0(resultsNames(dds)[2], ".csv"))
 
           
 #result with Independent hypothesis weighting
