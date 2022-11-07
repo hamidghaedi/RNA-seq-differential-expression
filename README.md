@@ -134,7 +134,7 @@ colnames(n_sample) <- paste("NT_", substr(colnames(n_sample),1,12))
 # Dissimilarity matrix calculation
 sampleDists <- dist(t(n_sample))
 sampleDistMatrix <- as.matrix(sampleDists)
-rownames(sampleDistMatrix) <- c(colnames(n_sample), colnames(t_sample))
+rownames(sampleDistMatrix) <- colnames(n_sample)
 colnames(sampleDistMatrix) <- NULL
 colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
 # heatmap visualization
